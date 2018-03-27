@@ -1,0 +1,9 @@
+.idea/
+
+node_modules/
+dist/
+
+
+.tern-project
+npm-debug.log*
+yarn-error.log
