@@ -1,7 +1,23 @@
+import '../styles/app.styl'
+
 const canvas = document.getElementById('tetris');
 const context = canvas.getContext('2d');
 
 context.scale(20, 20);
+
+const selectors = {
+  play: document.getElementById('play'),
+  playAgain: document.getElementById('play-again'),
+  end: document.getElementById('end'),
+  close: document.getElementById('close')
+}
+
+const classes = {
+  playHide: 'play_hide',
+  gameOver: 'wrap-end_show'
+}
+
+let stopGame = false;
 
 const createPiece = type => {
   if (type === 'T') {
@@ -110,7 +126,7 @@ const createMatrix = (width, height) => {
   return matrix;
 }
 
-const arena = createMatrix(12, 20);
+const arena = createMatrix(16, 27);
 
 const draw = () => {
   context.fillStyle = '#000';
@@ -120,8 +136,6 @@ const draw = () => {
 
   drawMatrix(player.matrix, player.position);
 }
-
-
 
 const drawMatrix = (matrix, offset) => {
   matrix.forEach((row, y) => {
@@ -171,6 +185,8 @@ const playerReset = () => {
 
   if (collide(arena, player)) {
     // Очистка поля при проигрыше.
+    selectors.end.classList.add(classes.gameOver);
+    stopGame = true;
     arena.forEach(row => row.fill(0));
     player.score = 0;
     updateScore();
@@ -229,7 +245,9 @@ const update = (time = 0) => {
   }
 
   draw();
-  requestAnimationFrame(update);
+  if (!stopGame) {
+    requestAnimationFrame(update);
+  }
 }
 
 const updateScore = () => {
@@ -250,6 +268,24 @@ document.addEventListener('keydown', event => {
   }
 });
 
-playerReset();
-updateScore();
-update();
+const startGame = () => {
+  stopGame = false;
+  playerReset();
+  updateScore();
+  update();
+}
+
+selectors.play.addEventListener('click', () => {
+  selectors.play.classList.add(classes.playHide);
+  startGame();
+})
+
+selectors.playAgain.addEventListener('click', () => {
+  selectors.end.classList.remove(classes.gameOver);
+  startGame();
+})
+
+selectors.close.addEventListener('click', () => {
+  selectors.end.classList.remove(classes.gameOver);
+  selectors.play.classList.remove(classes.playHide);
+})
